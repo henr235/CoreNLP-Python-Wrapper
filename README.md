@@ -9,8 +9,7 @@ It provides a simple API for text processing tasks such as Tokenization, Part of
 
 ## Usage
 ### Annotators wrapper - Simple Usage - Using local files
-This example demonstrate how to use the annotators wrapper using the local files downloded from [Stanford CoreNLP](http://nlp.stanford.edu/software/stanford-corenlp-4.1.0.zip).
-
+This example demonstrate how to use the annotators wrapper using the local files downloded from [Stanford CoreNLP](http://nlp.stanford.edu/software/stanford-corenlp-4.1.0.zip).   
 All the annotators and their information can be found in [Stanford CoreNLP Full List Of Annotators](https://stanfordnlp.github.io/CoreNLP/annotators.html).
 ```python
 from StanfordCoreNLP import StanfordCoreNLP
