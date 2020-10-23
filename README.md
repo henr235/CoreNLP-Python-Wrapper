@@ -31,8 +31,8 @@ The examples below will demonstrate how to define annotators Manualy using local
 
 Properties for using manual annotators:
 * annotators: [Full List Of Annotators](https://stanfordnlp.github.io/CoreNLP/annotators.html).
-* pinelineLanguage: 
-* outputFormat:
+* pinelineLanguage: [Full List Of Human Languages](https://stanfordnlp.github.io/CoreNLP/human-languages.html).
+* outputFormat: [JSON, XML, Text, Serialized](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html#annotate-with-corenlp-).
 #### Manual Annotators - Using local files
 ```python
 from StanfordCoreNLP import StanfordCoreNLP
