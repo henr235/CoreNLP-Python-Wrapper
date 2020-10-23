@@ -19,3 +19,34 @@ with StanfordCoreNLP('stanford-corenlp-4.1.0') as nlp:
     print('Sentence Splitting:', nlp.ssplit("Hello world. Hello world again."))
     print('Part of Speech:', nlp.pos("Marie was born in Paris."))
 ```
+Example output:
+```python
+Tokenize: [{'token': 'Hello', 'span': (0, 5)}, {'token': 'world', 'span': (6, 11)}, {'token': '.', 'span': (11, 12)}, {'token': 'Hello', 'span': (13, 18)}, {'token': 'world', 'span': (19, 24)}, {'token': 'again', 'span': (25, 30)}, {'token': '.', 'span': (30, 31)}]
+Sentence Splitting: ['Hello world.', 'Hello world again.']
+Part of Speech: [{'token': 'Marie', 'pos': 'NNP'}, {'token': 'was', 'pos': 'VBD'}, {'token': 'born', 'pos': 'VBN'}, {'token': 'in', 'pos': 'IN'}, {'token': 'Paris', 'pos': 'NNP'}, {'token': '.', 'pos': '.'}]
+```
+
+### Manual Annotators
+The examples below will demonstrate how to define annotators Manualy using local files or using existing server.
+
+Properties for using manual annotators:
+* annotators: [Full List Of Annotators](https://stanfordnlp.github.io/CoreNLP/annotators.html).
+* pinelineLanguage: 
+* outputFormat:
+#### Manual Annotators - Using local files
+```python
+from StanfordCoreNLP import StanfordCoreNLP
+
+nlp = StanfordCoreNLP('stanford-corenlp-4.1.0', lang = 'en')
+text = 'The small red car turned very quickly around the corner.'
+pros = {'annotators' : 'ner', 'pinelineLanguage' : 'en', 'outputFormat' : 'xml'} #Named Entity Recognition example
+print(nlp.annotate(text, properties = pros))
+nlp.close()
+```
+Example output:
+```python
+Tokenize: [{'token': 'Hello', 'span': (0, 5)}, {'token': 'world', 'span': (6, 11)}, {'token': '.', 'span': (11, 12)}, {'token': 'Hello', 'span': (13, 18)}, {'token': 'world', 'span': (19, 24)}, {'token': 'again', 'span': (25, 30)}, {'token': '.', 'span': (30, 31)}]
+Sentence Splitting: ['Hello world.', 'Hello world again.']
+Part of Speech: [{'token': 'Marie', 'pos': 'NNP'}, {'token': 'was', 'pos': 'VBD'}, {'token': 'born', 'pos': 'VBN'}, {'token': 'in', 'pos': 'IN'}, {'token': 'Paris', 'pos': 'NNP'}, {'token': '.', 'pos': '.'}]
+```
+
