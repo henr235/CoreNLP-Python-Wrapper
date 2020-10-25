@@ -325,7 +325,7 @@ This example will demonstrate how to use the `logging` module:
 from StanfordCoreNLP import StanfordCoreNLP
 import logging
 
-nlp = StanfordCoreNLP('stanford-corenlp-4.1.0', quiet = False, logging_level = logging.DEBUG)
+nlp = StanfordCoreNLP('stanford-corenlp-4.1.0', quiet = False, loggingLevel = logging.DEBUG)
 text = 'The small red car turned very quickly around the corner.'
 print(nlp.annotate(text)) #default annotate
 nlp.close()
