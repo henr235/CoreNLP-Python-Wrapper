@@ -32,8 +32,7 @@ nlp = StanfordCoreNLP('stanford-corenlp-4.1.0', lang = 'en')
 text = 'The small red car turned very quickly around the corner.'
 #pros = {'annotators' : 'pos', 'pinelineLanguage' : 'en', 'outputFormat' : 'JSON'} #Part of Speech example
 pros = {'annotators' : 'ner', 'pinelineLanguage' : 'en', 'outputFormat' : 'XML'} #Named Entity Recognition example
-print(nlp.annotate(text, properties = pros))
-#print(nlp.annotate(text)) #default annotate
+print(nlp.annotate(text, pros))
 nlp.close()
 '''
 '''
@@ -42,7 +41,14 @@ nlp = StanfordCoreNLP('http://corenlp.run', port = 80)
 text = 'Joe Smith lives in California. He used to live in Oregon.'
 #pros = {'annotators' : 'tokenize, ssplit', 'pinelineLanguage' : 'en', 'outputFormat' : 'XML'} #Sentence Splitting example
 pros = {'annotators' : 'lemma', 'pinelineLanguage' : 'en', 'outputFormat' : 'JSON'} #Lemmatization example
-print(nlp.annotate(text, properties = pros))
-#print(nlp.annotate(text)) #default annotate
+print(nlp.annotate(text, pros))
+nlp.close()
+'''
+'''
+#Manual Annotators - Support a number of annotators at the same time - Using local files
+nlp = StanfordCoreNLP('stanford-corenlp-4.1.0', lang = 'en')
+text = 'Joe Smith lives in California. He used to live in Oregon.'
+pros = {'annotators' : 'tokenize, ssplit, pos', 'pinelineLanguage' : 'en', 'outputFormat' : 'JSON'}
+print(nlp.annotate(text, pros, True))
 nlp.close()
 '''

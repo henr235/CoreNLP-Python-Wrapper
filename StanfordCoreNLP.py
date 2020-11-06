@@ -24,22 +24,36 @@ class StanfordCoreNLP(object):
         Parameters
         ----------
         pathHost : string
-            The path for the CoreNLP in formation. Can be local files or server.
+            The path for the CoreNLP Information.
+            The pathHost can be local files or existing server.
+            For example:
+            Local files can be the latest version that downloaded from from the StanfordCoreNLP
+            website as a folder - "stanford-corenlp-4.1.0"
+            Existing server can be - "http://corenlp.run"
         port : int
-            An integer value between 9000 to 65535 that represents the port value.
+            The port used in for the CoreNLP Java server that communicates with the python client.
+            The port is an integer value between 9000 to 65535. In case this value is none, then
+            an available value will be selected automatically.
             default value is None.
+            When using local files a port number will be selected in order to communicate with
+            the CoreNLP Java server.
+            When using existing server such as - "http://corenlp.run", the port number must be 80.
         memory : string
-            A string that represents the memory allocation value.
+            The memory requirements of the CoreNLP server.
+            This is a string that represents the memory allocation value.
             default value is 4g.
+            The values can be '4g', '8g' etc.
         lang : string
             A string that represents the Language type.
             default value is en (English).
+            The Languages available are English(en), Chinese(zh), Arabic(ar),
+            French(fr), German(de) and Spanish(es).
         timeout : int
             An integer that represents the Run time of the server.
             default value is 1500.
         quiet : Boolean
             A Boolean that Checks where to redirect the standard output
-            (if True to a file (/dev/null) or if False to regular stdout).
+            (if True to a file (/dev/null) (hide output) or if False to regular stdout).
             default value is True.
         loggingLevel : logging
             A value that represents the logging level in the system (used for debug).
@@ -58,20 +72,13 @@ class StanfordCoreNLP(object):
         self.loggingLevel = loggingLevel #Logging level for debug
         self.maxRetries = maxRetries #Maximum amount of retries to wait for a server
         self.pathDir = None #Path directory
-        self.createCoreNLP() #Create CoreNLP
-
-    def createCoreNLP(self):
-        """
-        This method binds together all the methods that check
-        the arguments and create the server with the Java to python communication.
-        """
-                
+        #Create CoreNLP     
         logging.basicConfig(level = self.loggingLevel) #Get logging level for debug
         self.checkLanguage() #Check if Language is valid
         self.checkMemory() #Check if Memory is valid
         #In case we use a server
-        if self.pathHost.startswith('http'):
-            self.url = self.pathHost + ':' + str(self.port)
+        if urlparse(self.pathHost).netloc:
+            self.url = "{}:{}".format(self.pathHost, self.port)
             logging.info('Using an existing server {}'.format(self.url))
         else: #In case we use local files
             #Check if Java available
@@ -97,7 +104,7 @@ class StanfordCoreNLP(object):
                 
         if self.lang not in ['en', 'zh', 'ar', 'fr', 'de', 'es']:
             raise ValueError('lang = ' + lang + ' not supported. Use English(en), Chinese(zh), Arabic(ar), '
-                            'French(fr), German(de), Spanish(es).')
+                            'French(fr), German(de) or Spanish(es).')
     def checkPathHost(self):
         """
         Check if the local directory and files exist.
@@ -269,7 +276,7 @@ class StanfordCoreNLP(object):
         requestedDictValue.raise_for_status()
         return requestedDictValue.json()
 
-    def annotate(self, textValue, properties = None):
+    def annotate(self, textValue, properties, multiAnnotator = False):
         """
         This is a wrapper for the Manual Annotators.
         Can be used in order to get mixed information from the textValue.
@@ -282,25 +289,188 @@ class StanfordCoreNLP(object):
         properties : dict
             A value in the format:
             {'annotators' : value, 'pinelineLanguage' : value, 'outputFormat' : value}
-            default value is None
+        multiAnnotator : boolean
+            If True, the return value will be separated for each annotator.
+            default is False.
 
         Returns
         -------
         Dictionary List
             A value that represents every value propertie in the given textValue.
+            If multiAnnotator is True, the return value will be separated for
+            each annotator.
         """
         
         #In case we need to encode text
         if sys.version_info.major >= 3:
             textValue = textValue.encode('utf-8')
-        #In case properties is None we set default parameters 
-        if properties is None:
-            properties = {'annotators' : 'tokenize, ssplit', 'pinelineLanguage' : 'en', 'outputFormat' : 'JSON'}
+        annotatorsType = properties['annotators']
+        if multiAnnotator:
+            properties['annotators'] = annotatorsType + ' ,ssplit' #Add 'ssplit' to rearrange the data for output
         #Get requested value from server
         requestedDictValue = requests.post(self.url, params = {'properties' : str(properties)}, data = textValue,
                           headers = {'Connection' : 'close'}, timeout = self.timeout)
         requestedDictValue.raise_for_status()
-        return requestedDictValue.text   
+        if multiAnnotator: #Get a list of separated Annotators Value
+            return self.getAnnotatorsValueDict(requestedDictValue.json(), annotatorsType)
+        else: #Get the full data of the Annotators
+            return requestedDictValue.text
+
+    def getAnnotatorsValueDict(self, requestedDictValue, annotatorsType):
+        """
+        This is a wrapper for the Manual Annotators.
+        Can be used in order to get mixed information from the textValue.
+
+        Parameters
+        ----------
+        requestedDictValue : JSON
+            A value that represents every value propertie in the given text
+            that filtered by the annotators.
+        annotatorsType : string
+            A string that represents every annotators used to create requestedDictValue.
+
+        Returns
+        -------
+        Dictionary
+            A value that represents every value propertie that will be separated for
+            each annotator.
+        """
+        
+        dictValue = {}
+        if 'tokenize' in annotatorsType:
+            returnDictList = []
+            #Go through all the tokens in each sentence in order to get the tokens
+            for s in requestedDictValue['sentences']:
+                for token in s['tokens']:
+                    returnDict = {}
+                    returnDict['token'] = token['originalText']
+                    returnDict['span'] = (token['characterOffsetBegin'], token['characterOffsetEnd'])
+                    returnDictList.append(returnDict)
+            dictValue['tokenize'] = returnDictList
+        if 'cleanxml' in annotatorsType:
+            dictValue['cleanxml'] = requestedDictValue
+        if 'ssplit' in annotatorsType:
+            #Get all the tokens for each sentence
+            tokens = [s for s in requestedDictValue['sentences']]
+            sentences = []
+            #Go through all the tokens in each sentence and combine them
+            for s in range(len(tokens)):
+                sentences.append(' '.join([token['originalText'] for token in tokens[s]['tokens']]))
+            dictValue['ssplit'] = sentences
+        if 'pos' in annotatorsType:
+            returnDictList = []
+            #Go through all the tokens in each sentence in order to get the tokens Part Of Speech
+            for s in requestedDictValue['sentences']:
+                for token in s['tokens']:
+                    returnDict = {}
+                    returnDict['token'] = token['originalText']
+                    returnDict['pos'] = token['pos']
+                    returnDict['span'] = (token['characterOffsetBegin'], token['characterOffsetEnd'])
+                    returnDictList.append(returnDict)
+            dictValue['pos'] = returnDictList
+        if 'lemma' in annotatorsType:
+            returnDictList = []
+            #Go through all the tokens in each sentence in order to get the tokens lemma
+            for s in requestedDictValue['sentences']:
+                for token in s['tokens']:
+                    returnDict = {}
+                    returnDict['token'] = token['originalText']
+                    returnDict['lemma'] = token['lemma']
+                    returnDict['span'] = (token['characterOffsetBegin'], token['characterOffsetEnd'])
+                    returnDictList.append(returnDict)
+            dictValue['lemma'] = returnDictList
+        if 'ner' in annotatorsType:
+            returnDictList = []
+            #Go through all the tokens in each sentence in order to get the tokens lemma
+            for s in requestedDictValue['sentences']:
+                for token in s['tokens']:
+                    returnDict = {}
+                    returnDict['token'] = token['originalText']
+                    returnDict['ner'] = token['ner']
+                    returnDict['span'] = (token['characterOffsetBegin'], token['characterOffsetEnd'])
+                    returnDictList.append(returnDict)
+            dictValue['ner'] = returnDictList
+        if 'entitymentions' in annotatorsType:
+            returnDictList = []
+            #Go through all the Entity Mentions in each sentence in order to get the Entity Mentions information
+            for s in requestedDictValue['sentences']:
+                for entity in s['entitymentions']:
+                    returnDictList.append(entity)
+            dictValue['entitymentions'] = returnDictList
+        if 'parse' in annotatorsType:
+            returnDictList = []
+            #Go through all the Constituency Parsing in each sentence in order to get the Constituency Parsing information
+            for s in requestedDictValue['sentences']:
+                returnDictList.append(s['parse'])
+            dictValue['parse'] = returnDictList
+        if 'depparse' in annotatorsType:
+            returnDictList = []
+            #Go through all the Dependency Parsing in each sentence in order to get the Dependency Parsing information
+            for s in requestedDictValue['sentences']:
+                for dependency in s['basicDependencies']:
+                    returnDictList.append(dependency)
+            dictValue['depparse'] = returnDictList
+        if 'coref' in annotatorsType:
+            returnDictList = []
+            #Go through all the Coreference Resolution in order to get the correct information
+            for key, corefsValue in requestedDictValue['corefs'].items():
+                for value in corefsValue:
+                    returnDictList.append(value)
+            dictValue['coref'] = returnDictList
+        if 'openie' in annotatorsType:
+            returnDictList = []
+            #Go through all the Constituency Parsing in each sentence in order to get the Constituency Parsing information
+            for s in requestedDictValue['sentences']:
+                returnDictList.append(s['openie'])
+            dictValue['openie'] = returnDictList
+        if 'kbp' in annotatorsType:
+            returnDictList = []
+            #Go through all the Knowledge Base Population in each sentence in order to get the Knowledge Base Population information
+            for s in requestedDictValue['sentences']:
+                returnDictList.append(s['kbp'])
+            dictValue['kbp'] = returnDictList
+        if 'quote' in annotatorsType:
+            returnDictList = []
+            #Go through all the Knowledge Base Population in each sentence in order to get the Knowledge Base Population information
+            for quote in requestedDictValue['quote']:
+                returnDictList.append(quote)
+            dictValue['quote'] = returnDictList
+        if 'sentiment' in annotatorsType:
+            returnDictList = []
+            #Go through all the sentiment in the text in order to rearrange them in the Dictionary List
+            for s in requestedDictValue['sentences']:
+                returnDict = {}
+                returnDict['sentimentValue'] = s['sentimentValue']
+                returnDict['sentiment'] = s['sentiment']
+                returnDict['sentimentDistribution'] = s['sentimentDistribution']
+                returnDict['sentimentTree'] = s['sentimentTree']
+                returnDictList.append(returnDict)
+            dictValue['sentiment'] = returnDictList
+        if 'truecase' in annotatorsType:
+            returnDictList = []
+            #Go through all the tokens, span and their truecase in the text
+            #In order to rearrange them in the Dictionary List
+            for s in requestedDictValue['sentences']:
+                for token in s['tokens']:
+                    returnDict = {}
+                    returnDict['token'] = token['originalText']
+                    returnDict['span'] = (token['characterOffsetBegin'], token['characterOffsetEnd'])
+                    returnDict['truecase'] = token['truecase']
+                    returnDict['truecaseText'] = token['truecaseText']
+                    returnDictList.append(returnDict)
+            dictValue['truecase'] = returnDictList
+        if 'udfeats' in annotatorsType:
+            returnDictList = []
+            #Go through all the Dependencies in the text in order to rearrange them in the Dictionary List
+            for s in requestedDictValue['sentences']:
+                returnDict = {}
+                returnDict['basicDependencies'] = s['basicDependencies']
+                returnDict['enhancedDependencies'] = s['enhancedDependencies']
+                returnDict['enhancedPlusPlusDependencies'] = s['enhancedPlusPlusDependencies']
+                returnDictList.append(returnDict)
+            dictValue['udfeats'] = returnDictList
+        return dictValue
+        
 #************************************************List Of Annotators************************************************#
     #Tokenization
     def tokenize(self, textValue):
@@ -409,6 +579,7 @@ class StanfordCoreNLP(object):
                 returnDict = {}
                 returnDict['token'] = token['originalText']
                 returnDict['pos'] = token['pos']
+                returnDict['span'] = (token['characterOffsetBegin'], token['characterOffsetEnd'])
                 returnDictList.append(returnDict)
         return returnDictList
 
@@ -438,6 +609,7 @@ class StanfordCoreNLP(object):
                 returnDict = {}
                 returnDict['token'] = token['originalText']
                 returnDict['lemma'] = token['lemma']
+                returnDict['span'] = (token['characterOffsetBegin'], token['characterOffsetEnd'])
                 returnDictList.append(returnDict)
         return returnDictList
 
@@ -467,6 +639,7 @@ class StanfordCoreNLP(object):
                 returnDict = {}
                 returnDict['token'] = token['originalText']
                 returnDict['ner'] = token['ner']
+                returnDict['span'] = (token['characterOffsetBegin'], token['characterOffsetEnd'])
                 returnDictList.append(returnDict)
         return returnDictList
 
