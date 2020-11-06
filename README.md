@@ -61,90 +61,7 @@ Example output:
             <NER>O</NER>
           </token>
           <token id="2">
-            <word>small</word>
-            <lemma>small</lemma>
-            <CharacterOffsetBegin>4</CharacterOffsetBegin>
-            <CharacterOffsetEnd>9</CharacterOffsetEnd>
-            <POS>JJ</POS>
-            <NER>O</NER>
-          </token>
-          <token id="3">
-            <word>red</word>
-            <lemma>red</lemma>
-            <CharacterOffsetBegin>10</CharacterOffsetBegin>
-            <CharacterOffsetEnd>13</CharacterOffsetEnd>
-            <POS>JJ</POS>
-            <NER>O</NER>
-          </token>
-          <token id="4">
-            <word>car</word>
-            <lemma>car</lemma>
-            <CharacterOffsetBegin>14</CharacterOffsetBegin>
-            <CharacterOffsetEnd>17</CharacterOffsetEnd>
-            <POS>NN</POS>
-            <NER>O</NER>
-          </token>
-          <token id="5">
-            <word>turned</word>
-            <lemma>turn</lemma>
-            <CharacterOffsetBegin>18</CharacterOffsetBegin>
-            <CharacterOffsetEnd>24</CharacterOffsetEnd>
-            <POS>VBD</POS>
-            <NER>O</NER>
-          </token>
-          <token id="6">
-            <word>very</word>
-            <lemma>very</lemma>
-            <CharacterOffsetBegin>25</CharacterOffsetBegin>
-            <CharacterOffsetEnd>29</CharacterOffsetEnd>
-            <POS>RB</POS>
-            <NER>O</NER>
-          </token>
-          <token id="7">
-            <word>quickly</word>
-            <lemma>quickly</lemma>
-            <CharacterOffsetBegin>30</CharacterOffsetBegin>
-            <CharacterOffsetEnd>37</CharacterOffsetEnd>
-            <POS>RB</POS>
-            <NER>O</NER>
-          </token>
-          <token id="8">
-            <word>around</word>
-            <lemma>around</lemma>
-            <CharacterOffsetBegin>38</CharacterOffsetBegin>
-            <CharacterOffsetEnd>44</CharacterOffsetEnd>
-            <POS>IN</POS>
-            <NER>O</NER>
-          </token>
-          <token id="9">
-            <word>the</word>
-            <lemma>the</lemma>
-            <CharacterOffsetBegin>45</CharacterOffsetBegin>
-            <CharacterOffsetEnd>48</CharacterOffsetEnd>
-            <POS>DT</POS>
-            <NER>O</NER>
-          </token>
-          <token id="10">
-            <word>corner</word>
-            <lemma>corner</lemma>
-            <CharacterOffsetBegin>49</CharacterOffsetBegin>
-            <CharacterOffsetEnd>55</CharacterOffsetEnd>
-            <POS>NN</POS>
-            <NER>O</NER>
-          </token>
-          <token id="11">
-            <word>.</word>
-            <lemma>.</lemma>
-            <CharacterOffsetBegin>55</CharacterOffsetBegin>
-            <CharacterOffsetEnd>56</CharacterOffsetEnd>
-            <POS>.</POS>
-            <NER>O</NER>
-          </token>
-        </tokens>
-      </sentence>
-    </sentences>
-  </document>
-</root>
+           ...
 ```
 
 #### Manual Annotators - Using existing server
@@ -177,145 +94,25 @@ Example output:
         },
         {
           "index": 2,
-          "word": "Smith",
-          "originalText": "Smith",
-          "lemma": "Smith",
-          "characterOffsetBegin": 4,
-          "characterOffsetEnd": 9,
-          "pos": "NNP",
-          "before": " ",
-          "after": " "
-        },
-        {
-          "index": 3,
-          "word": "lives",
-          "originalText": "lives",
-          "lemma": "live",
-          "characterOffsetBegin": 10,
-          "characterOffsetEnd": 15,
-          "pos": "VBZ",
-          "before": " ",
-          "after": " "
-        },
-        {
-          "index": 4,
-          "word": "in",
-          "originalText": "in",
-          "lemma": "in",
-          "characterOffsetBegin": 16,
-          "characterOffsetEnd": 18,
-          "pos": "IN",
-          "before": " ",
-          "after": " "
-        },
-        {
-          "index": 5,
-          "word": "California",
-          "originalText": "California",
-          "lemma": "California",
-          "characterOffsetBegin": 19,
-          "characterOffsetEnd": 29,
-          "pos": "NNP",
-          "before": " ",
-          "after": ""
-        },
-        {
-          "index": 6,
-          "word": ".",
-          "originalText": ".",
-          "lemma": ".",
-          "characterOffsetBegin": 29,
-          "characterOffsetEnd": 30,
-          "pos": ".",
-          "before": "",
-          "after": " "
-        }
-      ]
-    },
-    {
-      "index": 1,
-      "tokens": [
-        {
-          "index": 1,
-          "word": "He",
-          "originalText": "He",
-          "lemma": "he",
-          "characterOffsetBegin": 31,
-          "characterOffsetEnd": 33,
-          "pos": "PRP",
-          "before": " ",
-          "after": " "
-        },
-        {
-          "index": 2,
-          "word": "used",
-          "originalText": "used",
-          "lemma": "use",
-          "characterOffsetBegin": 34,
-          "characterOffsetEnd": 38,
-          "pos": "VBD",
-          "before": " ",
-          "after": " "
-        },
-        {
-          "index": 3,
-          "word": "to",
-          "originalText": "to",
-          "lemma": "to",
-          "characterOffsetBegin": 39,
-          "characterOffsetEnd": 41,
-          "pos": "TO",
-          "before": " ",
-          "after": " "
-        },
-        {
-          "index": 4,
-          "word": "live",
-          "originalText": "live",
-          "lemma": "live",
-          "characterOffsetBegin": 42,
-          "characterOffsetEnd": 46,
-          "pos": "VB",
-          "before": " ",
-          "after": " "
-        },
-        {
-          "index": 5,
-          "word": "in",
-          "originalText": "in",
-          "lemma": "in",
-          "characterOffsetBegin": 47,
-          "characterOffsetEnd": 49,
-          "pos": "IN",
-          "before": " ",
-          "after": " "
-        },
-        {
-          "index": 6,
-          "word": "Oregon",
-          "originalText": "Oregon",
-          "lemma": "Oregon",
-          "characterOffsetBegin": 50,
-          "characterOffsetEnd": 56,
-          "pos": "NNP",
-          "before": " ",
-          "after": ""
-        },
-        {
-          "index": 7,
-          "word": ".",
-          "originalText": ".",
-          "lemma": ".",
-          "characterOffsetBegin": 56,
-          "characterOffsetEnd": 57,
-          "pos": ".",
-          "before": "",
-          "after": ""
-        }
-      ]
-    }
-  ]
-}
+            ...
+```
+
+#### Manual Annotators - Support a number of annotators at the same time - Using local files
+Note: This example also support using existing server.
+```python
+from StanfordCoreNLP import StanfordCoreNLP
+
+nlp = StanfordCoreNLP('stanford-corenlp-4.1.0', lang = 'en')
+text = 'Joe Smith lives in California. He used to live in Oregon.'
+pros = {'annotators' : 'tokenize, ssplit, pos', 'pinelineLanguage' : 'en', 'outputFormat' : 'JSON'}
+print(nlp.annotate(text, pros, True))
+nlp.close()
+```
+Example output:
+```python
+{'tokenize': [{'token': 'Joe', 'span': (0, 3)}, {'token': 'Smith', 'span': (4, 9)}, {'token': 'lives', 'span': (10, 15)}, {'token': 'in', 'span': (16, 18)}, {'token': 'California', 'span': (19, 29)}, {'token': '.', 'span': (29, 30)}, {'token': 'He', 'span': (31, 33)}, {'token': 'used', 'span': (34, 38)}, {'token': 'to', 'span': (39, 41)}, {'token': 'live', 'span': (42, 46)}, {'token': 'in', 'span': (47, 49)}, {'token': 'Oregon', 'span': (50, 56)}, {'token': '.', 'span': (56, 57)}], 
+'ssplit': ['Joe Smith lives in California.', 'He used to live in Oregon.'], 
+'pos': [{'token': 'Joe', 'pos': 'NNP', 'span': (0, 3)}, {'token': 'Smith', 'pos': 'NNP', 'span': (4, 9)}, {'token': 'lives', 'pos': 'VBZ', 'span': (10, 15)}, {'token': 'in', 'pos': 'IN', 'span': (16, 18)}, {'token': 'California', 'pos': 'NNP', 'span': (19, 29)}, {'token': '.', 'pos': '.', 'span': (29, 30)}, {'token': 'He', 'pos': 'PRP', 'span': (31, 33)}, {'token': 'used', 'pos': 'VBD', 'span': (34, 38)}, {'token': 'to', 'pos': 'TO', 'span': (39, 41)}, {'token': 'live', 'pos': 'VB', 'span': (42, 46)}, {'token': 'in', 'pos': 'IN', 'span': (47, 49)}, {'token': 'Oregon', 'pos': 'NNP', 'span': (50, 56)}, {'token': '.', 'pos': '.', 'span': (56, 57)}]}
 ```
 
 ## Debug
