@@ -94,7 +94,7 @@ Example output:
         },
         {
           "index": 2,
-            ...
+           ...
 ```
 
 #### Manual Annotators - Support a number of annotators at the same time - Using local files
