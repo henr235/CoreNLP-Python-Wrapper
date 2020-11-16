@@ -19,13 +19,53 @@ with StanfordCoreNLP('stanford-corenlp-4.1.0') as nlp:
     print('Sentence Splitting:', nlp.ssplit("Hello world. Hello world again."))
     print('Part of Speech:', nlp.pos("Marie was born in Paris."))
 ```
-Example output:
-```json.dumps
-Tokenize: [{'token': 'Hello', 'span': (0, 5)}, {'token': 'world', 'span': (6, 11)}, {'token': '.', 'span': (11, 12)}, {'token': 'Hello', 'span': (13, 18)}, {'token': 'world', 'span': (19, 24)}, {'token': 'again', 'span': (25, 30)}, {'token': '.', 'span': (30, 31)}]
-Sentence Splitting: ['Hello world.', 'Hello world again.']
-Part of Speech: [{'token': 'Marie', 'pos': 'NNP'}, {'token': 'was', 'pos': 'VBD'}, {'token': 'born', 'pos': 'VBN'}, {'token': 'in', 'pos': 'IN'}, {'token': 'Paris', 'pos': 'NNP'}, {'token': '.', 'pos': '.'}]
+Example output Tokenize:
+```json
+Tokenize: [
+    {
+        "token": "Hello",
+        "span": [
+            0,
+            5
+        ]
+    },
+    {
+        "token": "world",
+        "span": [
+            6,
+            11
+        ]
+    },
+    ...
 ```
-
+Example output Sentence Splitting:
+```json
+Sentence Splitting: [
+    "Hello world.",
+    "Hello world again."
+]
+```
+Example output Part of Speech:
+```json
+Part of Speech: [
+    {
+        "token": "Marie",
+        "pos": "NNP",
+        "span": [
+            0,
+            5
+        ]
+    },
+    {
+        "token": "was",
+        "pos": "VBD",
+        "span": [
+            6,
+            9
+        ]
+    },
+    ...
+```
 ### Manual Annotators
 The examples below will demonstrate how to define annotators Manualy using local files or using existing server.
 
@@ -75,7 +115,7 @@ print(nlp.annotate(text, properties = pros))
 nlp.close()
 ```
 Example output:
-```json.dumps
+```json
 {
   "sentences": [
     {
@@ -109,10 +149,45 @@ print(nlp.annotate(text, pros, True))
 nlp.close()
 ```
 Example output:
-```json.dumps
-{'tokenize': [{'token': 'Joe', 'span': (0, 3)}, {'token': 'Smith', 'span': (4, 9)}, {'token': 'lives', 'span': (10, 15)}, {'token': 'in', 'span': (16, 18)}, {'token': 'California', 'span': (19, 29)}, {'token': '.', 'span': (29, 30)}, {'token': 'He', 'span': (31, 33)}, {'token': 'used', 'span': (34, 38)}, {'token': 'to', 'span': (39, 41)}, {'token': 'live', 'span': (42, 46)}, {'token': 'in', 'span': (47, 49)}, {'token': 'Oregon', 'span': (50, 56)}, {'token': '.', 'span': (56, 57)}], 
-'ssplit': ['Joe Smith lives in California.', 'He used to live in Oregon.'], 
-'pos': [{'token': 'Joe', 'pos': 'NNP', 'span': (0, 3)}, {'token': 'Smith', 'pos': 'NNP', 'span': (4, 9)}, {'token': 'lives', 'pos': 'VBZ', 'span': (10, 15)}, {'token': 'in', 'pos': 'IN', 'span': (16, 18)}, {'token': 'California', 'pos': 'NNP', 'span': (19, 29)}, {'token': '.', 'pos': '.', 'span': (29, 30)}, {'token': 'He', 'pos': 'PRP', 'span': (31, 33)}, {'token': 'used', 'pos': 'VBD', 'span': (34, 38)}, {'token': 'to', 'pos': 'TO', 'span': (39, 41)}, {'token': 'live', 'pos': 'VB', 'span': (42, 46)}, {'token': 'in', 'pos': 'IN', 'span': (47, 49)}, {'token': 'Oregon', 'pos': 'NNP', 'span': (50, 56)}, {'token': '.', 'pos': '.', 'span': (56, 57)}]}
+```json
+{
+    "tokenize": [
+        {
+            "token": "Joe",
+            "span": [
+                0,
+                3
+            ]
+        },
+        {
+            "token": "Smith",
+            "span": [
+                4,
+                9
+            ]
+        },
+        {
+            "token": "lives",
+            "span": [
+                10,
+                15
+            ]
+        },
+        {
+            "token": "in",
+            "span": [
+                16,
+                18
+            ]
+        },
+        {
+            "token": "California",
+            "span": [
+                19,
+                29
+            ]
+        },
+        ...
 ```
 
 ## Debug
