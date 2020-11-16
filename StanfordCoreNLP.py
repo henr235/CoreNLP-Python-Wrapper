@@ -16,16 +16,16 @@ except ImportError:
 
 
 class StanfordCoreNLP(object):
-    def __init__(self, pathHost, port = None, memory = '4g', lang = 'en', timeout = 1500, quiet = True,
+    def __init__(self, localDirOrURLServer, port = None, memory = '4g', lang = 'en', timeout = 1500, quiet = True,
                  loggingLevel = logging.WARNING, maxRetries = 5):
         """
         The Constructor for StanfordCoreNLP class.
         
         Parameters
         ----------
-        pathHost : string
+        localDirOrURLServer : string
             The path for the CoreNLP Information.
-            The pathHost can be local files or existing server.
+            The localDirOrURLServer can be local files or existing server.
             For example:
             Local files can be the latest version that downloaded from from the StanfordCoreNLP
             website as a folder - "stanford-corenlp-4.1.0"
@@ -57,13 +57,13 @@ class StanfordCoreNLP(object):
             default value is True.
         loggingLevel : logging
             A value that represents the logging level in the system (used for debug).
-            default value is logging.WARNING.
+            default value is logging.debug.
         maxRetries : int
             An integer that represents the Maximum amount of retries to wait for a server.
             default value is 5.
         """
                 
-        self.pathHost = pathHost #The path for the CoreNLP in formation. Can be local files or server.
+        self.localDirOrURLServer = localDirOrURLServer #The path for the CoreNLP in formation. Can be local files or server.
         self.port = port #Port value
         self.memory = memory #Memory allocation value
         self.lang = lang #Language type
@@ -77,16 +77,16 @@ class StanfordCoreNLP(object):
         self.checkLanguage() #Check if Language is valid
         self.checkMemory() #Check if Memory is valid
         #In case we use a server
-        if urlparse(self.pathHost).netloc:
-            self.url = "{}:{}".format(self.pathHost, self.port)
-            logging.info('Using an existing server {}'.format(self.url))
+        if urlparse(self.localDirOrURLServer).netloc:
+            self.url = f"{self.localDirOrURLServer}:{self.port}"
+            logging.debug('Using an existing server {}'.format(self.url))
         else: #In case we use local files
             #Check if Java available
             if not subprocess.call(['java', '-version'], stdout = subprocess.PIPE, stderr = subprocess.STDOUT) == 0:
                 raise RuntimeError('Java not found.')
-            self.checkPathHost() #Check if PathHost is valid
+            self.checkLocalDirValue() #Check if localDirOrURLServer is valid
             self.checkPort() #Check if Port is valid
-            self.createNativeServer() #Create Native Server
+            self.createLocalServer() #Create Native Server
         self.startServer() #start Server
 
     def checkMemory(self):
@@ -105,15 +105,15 @@ class StanfordCoreNLP(object):
         if self.lang not in ['en', 'zh', 'ar', 'fr', 'de', 'es']:
             raise ValueError('lang = ' + lang + ' not supported. Use English(en), Chinese(zh), Arabic(ar), '
                             'French(fr), German(de) or Spanish(es).')
-    def checkPathHost(self):
+    def checkLocalDirValue(self):
         """
         Check if the local directory and files exist.
         """
                 
         #Check if the local directory exists
-        if not os.path.isdir(self.pathHost):
-            raise IOError(str(self.pathHost) + ' is not a directory.')
-        directory = os.path.normpath(self.pathHost) + os.sep
+        if not os.path.isdir(self.localDirOrURLServer):
+            raise IOError(str(self.localDirOrURLServer) + ' is not a directory.')
+        directory = os.path.normpath(self.localDirOrURLServer) + os.sep
         self.pathDir = directory
         #Language information
         languageFiles = {
@@ -151,20 +151,19 @@ class StanfordCoreNLP(object):
         if self.port in [conn.laddr[1] for conn in psutil.net_connections()]:
             raise IOError('Port ' + str(self.port) + ' is already in use.')
 
-    def createNativeServer(self):
+    def createLocalServer(self):
         """
         Creates new server in order to communicate with the CoreNLP.
         """
                 
-        logging.info('Initializing native server...') #Used for debug
+        logging.debug('Initializing native server...') #Used for debug
         #Gets the information to create the server
         cmd = "java"
         javaArgs = "-Xmx{}".format(self.memory)
         javaClass = "edu.stanford.nlp.pipeline.StanfordCoreNLPServer"
         classPath = '"{}*"'.format(self.pathDir)
-        args = [cmd, javaArgs, '-cp', classPath, javaClass, '-port', str(self.port), 'timeout', str(self.timeout)]
-        args = ' '.join(args)
-        logging.info(args) #Used for debug
+        args = f"{cmd} {javaArgs} -cp {classPath} {javaClass} -port {str(self.port)} timeout {str(self.timeout)}"
+        logging.debug(args) #Used for debug
         #Checks where to redirect the standard output (file (/dev/null) or regular stdout)
         with open(os.devnull, 'w') as nullFile:
             outFile = None
@@ -172,7 +171,7 @@ class StanfordCoreNLP(object):
                 outFile = nullFile
             #Create the sub process that run the Java server
             self.p = subprocess.Popen(args, shell = True, stdout = outFile, stderr = subprocess.STDOUT)
-            logging.info('Server shell PID: {}'.format(self.p.pid)) #Used for debug
+            logging.debug('Server shell PID: {}'.format(self.p.pid)) #Used for debug
         self.url = 'http://localhost:' + str(self.port)
 
     def startServer(self):
@@ -190,10 +189,10 @@ class StanfordCoreNLP(object):
             #In case connection fails
             if trial > self.maxRetries:
                 raise ValueError('Corenlp server is not available')
-            logging.info('Waiting until the server is available.') #Used for debug
+            logging.debug('Waiting until the server is available.') #Used for debug
             trial += 1
             time.sleep(1)
-        logging.info('The server is available.') #Used for debug
+        logging.debug('The server is available.') #Used for debug
         
     def __enter__(self):
         """
@@ -215,24 +214,24 @@ class StanfordCoreNLP(object):
         to cleanup unnecessary values at the end of the run.
         """
         
-        logging.info('Cleanup...')#Used for debug
+        logging.debug('Cleanup...')#Used for debug
         if hasattr(self, 'p'):
             try:
                 parent = psutil.Process(self.p.pid)
             except psutil.NoSuchProcess:
-                logging.info('No process: {}'.format(self.p.pid))
+                logging.debug('No process: {}'.format(self.p.pid))
                 return
             if self.pathDir not in ' '.join(parent.cmdline()):
-                logging.info('Process not in: {}'.format(parent.cmdline()))
+                logging.debug('Process not in: {}'.format(parent.cmdline()))
                 return
             children = parent.children(recursive = True)
             #Killing all the child process that created during the run
             for process in children:
                 #Used for debug
-                logging.info('Killing pid: {}, cmdline: {}'.format(process.pid, process.cmdline()))
+                logging.debug('Killing pid: {}, cmdline: {}'.format(process.pid, process.cmdline()))
                 process.kill()
             #Used for debug
-            logging.info('Killing shell pid: {}, cmdline: {}'.format(parent.pid, parent.cmdline()))
+            logging.debug('Killing shell pid: {}, cmdline: {}'.format(parent.pid, parent.cmdline()))
             parent.kill()
 
     def getDataForAnnotatorsWrapper(self, url, annotators, textValue, *args, **kwargs):
@@ -269,7 +268,7 @@ class StanfordCoreNLP(object):
         if 'patternValue' in kwargs:
             params = {'pattern' : kwargs['patternValue'], 'properties' : str(properties),
                       'pipelineLanguage' : self.lang, 'filter' : kwargs['filterValue']}
-        logging.info(params)#Add information to debug
+        logging.debug(params)#Add information to debug
         #Get requested value from server
         requestedDictValue = requests.post(url, params = params, data = textValue,
                                             headers = {'Connection': 'close'}, timeout = self.timeout)

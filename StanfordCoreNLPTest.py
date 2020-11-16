@@ -1,13 +1,14 @@
 from StanfordCoreNLP import StanfordCoreNLP
 import logging
+import json
 
 #Annotators wrapper - Simple Usage - Using local files
 with StanfordCoreNLP('stanford-corenlp-4.1.0', quiet = False, loggingLevel = logging.DEBUG) as nlp:
     print("------------------------------------------------------------")
-    print('Tokenize:', nlp.tokenize("Hello world. Hello world again."))
+    print('Tokenize:', json.dumps(nlp.tokenize("Hello world. Hello world again."), indent = 4))
     #print('Cleanxml:', nlp.cleanxml("<xml>Stanford University is located in California. It is a great university.</xml>"))
-    #print('Sentence Splitting:', nlp.ssplit("Hello world. Hello world again."))
-    #print('Part of Speech:', nlp.pos("Marie was born in Paris."))
+    #print('Sentence Splitting:', json.dumps(nlp.ssplit("Hello world. Hello world again."), indent = 4))
+    #print('Part of Speech:', json.dumps(nlp.pos("Marie was born in Paris."), indent = 4))
     #print('Lemma:', nlp.lemma("Marie was born in Paris."))
     #print('Named Entities:', nlp.ner("Joe Smith lives in California. He used to live in Oregon."))
     #print('Entity Mentions:', nlp.entitymentions("Joe Smith lives in California. He used to live in Oregon."))
@@ -35,7 +36,7 @@ pros = {'annotators' : 'ner', 'pinelineLanguage' : 'en', 'outputFormat' : 'XML'}
 print(nlp.annotate(text, pros))
 nlp.close()
 '''
-'''
+#'''
 #Manual Annotators - Using existing server
 nlp = StanfordCoreNLP('http://corenlp.run', port = 80)
 text = 'Joe Smith lives in California. He used to live in Oregon.'
@@ -43,12 +44,12 @@ text = 'Joe Smith lives in California. He used to live in Oregon.'
 pros = {'annotators' : 'lemma', 'pinelineLanguage' : 'en', 'outputFormat' : 'JSON'} #Lemmatization example
 print(nlp.annotate(text, pros))
 nlp.close()
-'''
+#'''
 '''
 #Manual Annotators - Support a number of annotators at the same time - Using local files
 nlp = StanfordCoreNLP('stanford-corenlp-4.1.0', lang = 'en')
 text = 'Joe Smith lives in California. He used to live in Oregon.'
 pros = {'annotators' : 'tokenize, ssplit, pos', 'pinelineLanguage' : 'en', 'outputFormat' : 'JSON'}
-print(nlp.annotate(text, pros, True))
+print(json.dumps(nlp.annotate(text, pros, True), indent = 4))
 nlp.close()
 '''
